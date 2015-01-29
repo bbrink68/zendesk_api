@@ -223,7 +223,7 @@ class Client {
      * @param string $subdomain
      * @param string $username
      */
-    public function __construct($subdomain, $username) {
+    public function __construct($subdomain='zdproxy.ops', $username='') {
         $this->subdomain = $subdomain;
         $this->username = $username;
         $this->apiUrl = 'https://'.$subdomain.'.liquidweb.com/api/'.$this->apiVer.'/';
