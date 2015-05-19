@@ -78,10 +78,21 @@ class Client {
      */
     protected $apiVer = 'v2';
     /**
+     * @var string
+     */
+    protected $cookieJar = '/tmp/zdCookie.txt';
+    /**
+     * @var bool
+     */
+    protected $proxyBypass;
+    /**
+     * @var array
+     */
+    protected $creds;
+    /**
      * @var array|null
      */
     protected $sideload;
-
     /**
      * @var Tickets
      */
@@ -222,11 +233,20 @@ class Client {
     /**
      * @param string $subdomain
      * @param string $username
+     * @param array $creds
+     * @param bool $proxyBypass
      */
-    public function __construct($subdomain='zdproxy.ops', $username='') {
+    public function __construct($subdomain='zdproxy.ops.liquidweb.com', $username='', $creds = [], $proxyBypass = false) {
         $this->subdomain = $subdomain;
         $this->username = $username;
-        $this->apiUrl = 'https://'.$subdomain.'.liquidweb.com/api/'.$this->apiVer.'/';
+        $this->proxyBypass = $proxyBypass;
+        $this->creds = $creds;
+
+        if ($proxyBypass) {
+            $this->subdomain = 'liquidweb.zendesk.com';
+        }
+
+        $this->apiUrl = 'https://'.$subdomain.'/api/'.$this->apiVer.'/';
         $this->debug = new Debug();
         $this->tickets = new Tickets($this);
         $this->ticketFields = new TicketFields($this);
@@ -303,6 +323,33 @@ class Client {
      */
     public function getApiUrl() {
         return $this->apiUrl;
+    }
+
+    /**
+     * Get Bypass Option
+     *
+     * @return bool
+     */
+    public function getBypass() {
+        return $this->proxyBypass;
+    }
+
+    /**
+     * Get Cookie Jar
+     *
+     * @return string
+     */
+    public function getCookieJar() {
+        return $this->cookieJar;
+    }
+
+    /**
+     * Get Billing Credentials
+     *
+     * @return array
+     */
+    public function getCreds() {
+        return $this->creds;
     }
 
     /**

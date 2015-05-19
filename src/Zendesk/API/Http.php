@@ -63,6 +63,11 @@ class Http {
             $json = json_encode($json);
         }
 
+        // If Bypassing Proxy
+        if ($client->getBypass()) {
+            self::getCookie($client->getCookieJar(), $client->getCreds());
+        }
+
         if ($method == 'POST') {
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_POST, true);
@@ -101,6 +106,13 @@ class Http {
             curl_setopt($curl, CURLOPT_USERPWD, $client->getAuthText());
             curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: ' . $contentType, 'Accept: application/json'));
         }
+
+        if ($client->getBypass()) {
+            $cookieJar = $client->getCookieJar();
+            curl_setopt($curl, CURLOPT_COOKIEJAR, $cookieJar);
+            curl_setopt($curl, CURLOPT_COOKIEFILE, $cookieJar);
+        }
+
         curl_setopt($curl, CURLINFO_HEADER_OUT, true);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 30);
@@ -131,6 +143,30 @@ class Http {
 
         return json_decode($responseBody);
 
+    }
+
+    /**
+     * Get Billing Cookie
+     * @param $cookieJar
+     */
+    private static function getCookie($cookieJar, $creds)
+    {
+        $cookieUrl = 'https://billing.int.liquidweb.com/mysql/content/admin/zendesk/sso.mhtml?locale_id=1&return_to=https%3A%2F%2Fliquidweb.zendesk.com%2F&timestamp='.time();
+
+        $curl = curl_init($cookieUrl);
+        curl_setopt($curl, CURLOPT_COOKIEJAR, $cookieJar);
+        curl_setopt($curl, CURLOPT_COOKIEFILE, $cookieJar);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 30);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_HEADER, true);
+        curl_setopt($curl, CURLOPT_VERBOSE, true);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($curl, CURLOPT_MAXREDIRS, 3);
+        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt($curl, CURLOPT_USERPWD, "{$creds['username']}:{$creds['password']}");
+        $response = curl_exec($curl);
     }
 
     /**
