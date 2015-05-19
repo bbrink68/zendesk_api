@@ -246,7 +246,7 @@ class Client {
             $this->subdomain = 'liquidweb.zendesk.com';
         }
 
-        $this->apiUrl = 'https://'.$subdomain.'/api/'.$this->apiVer.'/';
+        $this->apiUrl = 'https://'.$this->subdomain.'/api/'.$this->apiVer.'/';
         $this->debug = new Debug();
         $this->tickets = new Tickets($this);
         $this->ticketFields = new TicketFields($this);

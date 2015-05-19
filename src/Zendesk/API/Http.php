@@ -55,17 +55,17 @@ class Http {
      */
     public static function send(Client $client, $endPoint, $json = null, $method = 'GET', $contentType = 'application/json') {
 
+        // If Bypassing Proxy
+        if ($client->getBypass()) {
+            self::getCookie($client->getCookieJar(), $client->getCreds());
+        }
+
         $url    = $client->getApiUrl() . $endPoint;
         $method = strtoupper($method);
         if (null == $json) {
             $json = new \stdClass();
         } else if ($contentType == 'application/json' && $method != 'GET' && $method != 'DELETE') {
             $json = json_encode($json);
-        }
-
-        // If Bypassing Proxy
-        if ($client->getBypass()) {
-            self::getCookie($client->getCookieJar(), $client->getCreds());
         }
 
         if ($method == 'POST') {
